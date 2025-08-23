@@ -1,118 +1,136 @@
-# a = int(input("Веди возраст"))
-# while a >0:
-#     print("С днём рождения")
-#     a -=1
-# class Cat:
-#     def __init__(self,name,age):
-#         self.name = name
-#         self.age = age
-# cat = Cat("Шарик",14)
-# print(cat)
+import tkinter as tk
+import file_connection
+from tkinter import messagebox
+
+# Содержимое статей (названия и текст статей)
+articles = file_connection.get_articles()
+
+current_article = None
+
+# Функция для отображения выбранной статьи
+def show_article():
+    global current_article
+    selected_index = listbox.curselection()
+    if selected_index:
+        title = listbox.get(selected_index)
+        current_article = title
+
+        # Очистка окна и добавление текста статьи
+        text.delete(1.0, tk.END)
+        text.insert(tk.END, articles[title])
+
+        # Очистка окна и добавление названия и текста статьи
+        title_label.config(text=title)
+        title_label.pack()
+        text.pack()
+        back_button.pack()
+        listbox.pack_forget()
+        delete_button.pack_forget()
+        read_button.pack_forget()
+        add_button.pack_forget()
 
 
-import random
-rand_a_z = "qwertyuiopasdfghjklzxcvbnm!@#$%^&*/-+?~`=_12345678910"
-rand_password_len = input("Введите длину пароля или check: ")
-if rand_password_len == "check":
-    length = int(input("Введите длину пароля для проверки сложности: "))
-    if length < 8:
-        print("Пароль слабый")
-    elif 8 <= length <= 10:
-        print("Пароль средний")
-    elif length > 10:
-        print("Пароль сильный")
-else:
-    rand_password = int(rand_password_len)
-    ro = ""
-    while len(ro) != rand_password:
-        ro += random.choice(rand_a_z)
-    print( ro)
+# Функция для возврата к списку статей
+def go_back():
+    global current_article
+    current_article = None
+
+    # Очистка текста статьи и названия, отображение списка статей
+    text.delete(1.0, tk.END)
+    title_label.config(text="")
+    listbox.pack(fill=tk.BOTH)
+    text.pack_forget()
+    title_label.pack_forget()
+    back_button.pack_forget()
+    read_button.pack()
+    add_button.pack()
+    delete_button.pack()
 
 
-def re():
-    print("Регистрация")
-    name = input("Введите своё имя:")
-    pas = (input("Введите пароль Пароль дрожен быть не короче 5 символов и только латинскими буквами:"))
-    if len(pas) < 6:
-        print("Ошибка")
-    return name,pas
+# Функция для удаления статьи
+def delete_article():
+    global current_article, articles, listbox
+    selected_index = listbox.curselection()
+    if selected_index:
+        title = listbox.get(selected_index)
+        current_article = title
+        answer = messagebox.askyesno("Удаление", "Вы действительно хотите удалить эту статью?")
+        if answer:
+            go_back()
+            del articles[title]
+            listbox.delete(selected_index)
+            file_connection.delete_article(title)
 
-name,pas = re()
 
-def log(name,pas):
-    p = input("Введите своё имя Для входа:")
-    pasa = (input("Введите пароль для входа:"))
+# Функция для добавления новой статьи
+def add_article():
+    global articles
 
-    if p != name and pasa != pas:
-        print("Ошибка")
+    def save_new_article():
+        new_title = entry_title.get()
+        new_text = text.get("1.0", tk.END)
+        if new_title and new_text:
+            articles[new_title] = new_text
+            listbox.insert(0, new_title)
+            file_connection.save_article(new_title, new_text)
+            add_window.destroy()
+            show_article()
 
-log(name,pas)
-# import zipfile
-# for i in range(5):
-#     with open(f"Файл{i}.txt","w") as file:
-#         file.write("text1")
-# try:
-#     with zipfile.ZipFile("cap_edu.zip","a",compression=zipfile.ZIP_DEFLATED, compresslevel=3) as myfile:
-#         for i in range(5):
-#             myfile.write(f"Файл{i}.txt")
-#         print(myfile.namelist())
-#         myfile.extractall("on_arch")
-# except Exception:
-#     print("Error")
-# from turtle import *
-# pensize(20)
-# color("red")
-# begin_fill()
-# forward(100)
-# left(120)
-# forward(90)
-# left(115)
-# forward(90)
-# end_fill()
-# exitonclick()
-# from turtle import *
-# pensize(20)
-# color("red")
-# for i in range(5):
-#     forward(100)
-#     left(72)
-# exitonclick()
-# from turtle import *
-# penup()
-# goto(-350,0)
-# pendown()
-# for i in range(4):
-#     left(90)
-#     forward(100)
-# penup()
-# goto(-350,100)
-# pendown()
-# left(120)
-# forward(90)
-# left(115)
-# forward(99)
-# penup()
-# goto(0,0)
-# pendown()
-# left(190)
-# forward(90)
-# right(150)
-# forward(100)
-# penup()
-# goto(39,88)
-# pendown()
-# left(165)
-# forward(100)
-# right(220)
-# forward(70)
-# penup()
-# goto(57,187)
-# pendown()
-# right(300)
-# forward(80)
-# penup()
-# goto(36,198)
-# pendown()
-# circle(30)
-# exitonclick()
+    add_window = tk.Toplevel(root)
+    add_window.title("Добавить статью")
 
+    label_title = tk.Label(add_window, text="Введите название статьи:")
+    label_title.pack()
+    entry_title = tk.Entry(add_window)
+    entry_title.pack()
+
+    label_text = tk.Label(add_window, text="Введите текст статьи:")
+    label_text.pack()
+    text = tk.Text(add_window, wrap=tk.WORD)
+    text.pack()
+
+    save_button = tk.Button(add_window, text="Сохранить", command=save_new_article)
+    save_button.pack()
+
+
+# Создание окна
+root = tk.Tk()
+root.title("Кошко-вики")
+root.geometry("600x500")  # Фиксированный размер окна
+
+# Создание списка статей
+listbox = tk.Listbox(root)
+listbox.pack(fill=tk.BOTH)
+
+# Заполнение списка статьями
+for article in articles:
+    listbox.insert(tk.END, article)
+
+# Создание текстового виджета для отображения текста статьи (изначально скрыт)
+text = tk.Text(root, wrap=tk.WORD)
+text.pack()
+text.pack_forget()
+
+# Создание виджета Label для отображения названия статьи (изначально скрыт)
+title_label = tk.Label(root, text="", font=("Helvetica", 14))
+title_label.pack()
+title_label.pack_forget()
+
+# Создание кнопки "Назад" (изначально скрытой)
+back_button = tk.Button(root, text="Назад", command=go_back)
+back_button.pack()
+back_button.pack_forget()
+
+# Создание кнопки "Прочитать"
+read_button = tk.Button(root, text="Прочитать", command=show_article)
+read_button.pack()
+
+# Создание кнопки "Добавить статью"
+add_button = tk.Button(root, text="Добавить статью", command=add_article)
+add_button.pack()
+
+delete_button = tk.Button(root, text="Удалить статью", command=delete_article)
+delete_button.pack()
+
+# Запуск приложения
+root.mainloop()
