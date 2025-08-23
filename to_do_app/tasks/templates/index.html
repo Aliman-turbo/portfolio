@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <style>
+    .alert{color:red}
+    .form-group{margin: 10px 0;}
+    .form-group input{width:250px;height: 25px;border-radius:3px;}
+</style>
+</head>
+<body class="container">
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        <div>
+            {%for field in form %}
+        <div class="form-group">
+            {{field.label_tag}}
+            <div>{{field}}</div>
+            {% if field.errors %}
+            {% for error in field.errors %}
+        <div class="alert alert_danger">
+            {{error}}
+        </div>
+        {% endfor %}
+        {% endif %}
+        </div>
+            {% endfor %}
+        </div>
+        <p><input type="submit" value="Send"></p>
+    </form>
+
+
+
+
+
+
+
+{% comment %}
+<form method="POST" novalidate>
+    {% csrf_token %}
+    <div>
+        {%for field in form %}
+        <div class="form-group">
+        {{field.label_tag}}
+            <div>{{field}}</div>
+            <div class="error">{{field.errors}}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <p><input type="submit" value="Send"></p>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+<form method="POST">
+{% csrf_token %}
+    <table>
+    {{form}}
+        <p>Введи имя</p>
+        <input type="text">
+    </table>
+    <input type="submit" value="Sumbit">
+</form>
+
+    <select multiple name="languages">
+        <option>Python</option>
+        <option>C++</option>
+        <option>Java</option>
+        <option>C#</option>
+    </select>
+    <input type="submit" value="Send"/>
+<h2>User form</h2>
+<form method="post" action="post_user/">
+{% csrf_token %}
+    <p>Name: <br><input name ="name"/></p>
+    <p>Age: <br><input name ="age" type="number"/></p>
+
+    <p>
+        Languages<br/>
+        <input name="languages"><br/>
+        <input name="languages"><br/>
+        <input name="languages"><br/>
+
+    </p>
+
+    <select multiple name="languages">
+        <option>Python</option>
+        <option>C++</option>
+        <option>Java</option>
+        <option>C#</option>
+    </select>
+    <input type="submit" value="Send"/>
+</form>
+{% endcomment %}
+</body>
+</html>
